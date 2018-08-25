@@ -10,6 +10,11 @@ const Dav =  "324432889561219072";
 const Status = `${prefix}help `;
 const queue = new Map();
 const YouTube = require("simple-youtube-api");
+client.on('ready', () => {
+    console.log(`Logged in as ${client.user.tag}!`)
+    client.channels.get(logchannel).send(`**Bot Logged in as ${client.user.tag}\, ${client.guilds.size} Servers \, ${client.users.size} Users Dav-ID:${Dav} !** `);
+    client.user.setPresence({ game: { name: `${Status}`, url: 'https://twitch.tv/....', type: 1 } });
+});
 
 client.on('message', async msg => {
   const queue = new Map();
