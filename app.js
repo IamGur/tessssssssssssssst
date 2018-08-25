@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const YTDL = require('ytdl-core');
+const ytdl = require('ytdl-core');
 const prefix = '!';
 const logchannel = '475564126140104704';
 const botlog = '475564552159756308';
