@@ -6,6 +6,8 @@ const botlog = '475564552159756308';
 const error = '475574421441216522';
 const re = '476368008730902548';
 const Dav =  "324432889561219072";
+var dispatcher;
+var prefix = '!';
 const Status = `${prefix}help `;
 
 client.on('ready', () => {
