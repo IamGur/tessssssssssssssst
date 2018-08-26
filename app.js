@@ -10,6 +10,7 @@ const Dav =  "324432889561219072";
 const Status = `${prefix}help `;
 var dispatcher;
 const songQueue = new Map();
+const queue = new Map();
 var currentSongIndex = 0;
 var previousSongIndex = 0;
 var shuffle = false;
