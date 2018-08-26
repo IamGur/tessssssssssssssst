@@ -24,7 +24,6 @@ client.on('ready', () => {
 });
 
 client.on('message', async msg => {
-  const YouTube = require("simple-youtube-api");
   const youtube = new YouTube(process.env.APIKEY);
   if (msg.author.id === Dav || msg.member.roles.some(r => ["DJ"].includes(r.name))) {
       if (!msg.content.startsWith(prefix)) return undefined;
