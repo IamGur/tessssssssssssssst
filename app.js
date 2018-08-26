@@ -73,9 +73,9 @@ Please provide a value to select one of the 🔎 results ranging from 1-10.
           }
       }
           if (command === "skip" || command === "next" || command === "s") {
-        if (message.member.voiceChannel !== undefined) {
-            if (!message.guild.me.voiceChannel) {
-                message.channel.send("bot is not in voice channel and nothing to play", { reply: message });
+        if (msg.member.voiceChannel !== undefined) {
+            if (!msg.guild.me.voiceChannel) {
+                msg.channel.send("bot is not in voice channel and nothing to play", { reply: msg });
                 return;
             }
             if (serverQueue.songs.length > 0) {
@@ -90,20 +90,20 @@ Please provide a value to select one of the 🔎 results ranging from 1-10.
                     currentSongIndex = serverQueue.songs.length - 1;
                     serverQueue.songs = [];
                     currentSongIndex = 0;
-                    message.member.voiceChannel.leave();
+                    msg.member.voiceChannel.leave();
                     var finishembed = new Discord.RichEmbed()
                         .setColor(randomcolor)
                         .setAuthor("Finished playing because no more song in the queue", `${message.author.displayAvatarURL}`)
                         .setDescription("please add more song if you like 🎧")
                         .setTimestamp();
-                    message.channel.send({ embed: finishembed });
+                    msg.channel.send({ embed: finishembed });
                 }
                 dispatcher.end("next");
             } else {
-                message.channel.send("There are no more songs :sob:", { reply: message });
+                msg.channel.send("There are no more songs :sob:", { reply: msg });
             }
         } else {
-            message.channel.send("You can't hear my music if you're not in a voice channel :cry:", { reply: message });
+            msg.channel.send("You can't hear my music if you're not in a voice channel :cry:", { reply: msg });
         }
     }
 
