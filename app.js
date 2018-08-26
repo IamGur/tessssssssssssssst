@@ -8,8 +8,14 @@ const error = '475574421441216522';
 const re = '476368008730902548';
 const Dav =  "324432889561219072";
 const Status = `${prefix}help `;
-const queue = new Map();
+var dispatcher;
+const songQueue = new Map();
+var currentSongIndex = 0;
+var previousSongIndex = 0;
+var shuffle = false;
+var autoremove = false;
 const YouTube = require("simple-youtube-api");
+
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`)
     client.channels.get(logchannel).send(`**Bot Logged in as ${client.user.tag}\, ${client.guilds.size} Servers \, ${client.users.size} Users Dav-ID:${Dav} !** `);
@@ -17,7 +23,6 @@ client.on('ready', () => {
 });
 
 client.on('message', async msg => {
-  const queue = new Map();
   const YouTube = require("simple-youtube-api");
   const youtube = new YouTube(process.env.APIKEY);
   if (msg.author.id === Dav || msg.member.roles.some(r => ["DJ"].includes(r.name))) {
@@ -28,49 +33,57 @@ client.on('message', async msg => {
       const serverQueue = queue.get(msg.guild.id);
       let command = msg.content.toLowerCase().split(' ')[0];
       command = command.slice(prefix.length)
-      if (command === 'play') {
-          const voiceChannel = msg.member.voiceChannel;
-          if (!voiceChannel) return msg.channel.send('I\'m sorry but you need to be in a voice channel to play music!');
-          if (url.match(/^https?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/)) {
-              const playlist = await youtube.getPlaylist(url);
-              const videos = await playlist.getVideos();
-              for (const video of Object.values(videos)) {
-                  const video2 = await youtube.getVideoByID(video.id);
-                  await handleVideo(video2, msg, voiceChannel, true);
-              }
-              return msg.channel.send(`✅ Playlist: **${playlist.title}** has been added to the queue!`);
-          } else {
+        if (command === "play" || command === "p" || command === "yt") {
+        const youtube = new YouTube(process.env.GOOGLEAPIKEY);
+        const voiceChannel = message.member.voiceChannel;
+        let args0 = args.join("").substring(command.length);
+        let searchString = args0.slice();
+        const url = args0 ? args0.replace(/<(.+)>/g, '$1') : '';
+        if (!voiceChannel) return message.channel.send("You are not in a voice channel please join a channel and use this command again");
+        const permissions = voiceChannel.permissionsFor(message.client.user);
+        if (!permissions.has('CONNECT')) return message.channel.send("I do not have the permissions to join that voice channel pleae give me permissions to join");
+        if (!permissions.has("SPEAK")) return message.channel.send("I do not have the permissions to speak in that voice channel pleae give me permissions to join");
+        if (url.match(/^https?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/)) {
+            const playlist = await youtube.getPlaylist(url);
+            const videos = await playlist.getVideos();
+            for (const video of Object.values(videos)) {
+                const video2 = await youtube.getVideoByID(video.id);
+                await addSong(message, video2, voiceChannel, true);
+            }
+            return message.channel.send(`✅ Playlist: **${playlist.title}** has been added to the queue!`);
+        } else {
+            try {
+                var video = await youtube.getVideo(url);
+            } catch (error) {
+                try {
+                    var videos = await youtube.searchVideos(searchString, 1);
+                    //let index = 0;
+                    /*message.channel.send(`
+      __**Song selection:**__
+      ${videos.map(video2 => `**${++index} -** ${video2.title}`).join('\n')}
+      Please provide a value to select one of the search results ranging from 1-10.
+                          `);
               try {
-                  var video = await youtube.getVideo(url);
-              } catch (error) {
-                  try {
-                      var videos = await youtube.searchVideos(searchString, 10);
-                      let index = 0;
-                      msg.channel.send(`
-__**Song selection:**__
-${videos.map(video2 => `**${++index} -** ${video2.title}`).join('\n')}
-Please provide a value to select one of the 🔎 results ranging from 1-10.
-        `);
-                      try {
-                          var response = await msg.channel.awaitMessages(msg2 => msg2.content > 0 && msg2.content < 11, {
-                              maxMatches: 1,
-                              time: 10000,
-                              errors: ['time']
-                          });
-                      } catch (err) {
-                          console.error(err);
-                          return msg.channel.send('No or invalid value entered, cancelling video selection.');
-                      }
-                      const videoIndex = parseInt(response.first().content);
-                      var video = await youtube.getVideoByID(videos[videoIndex - 1].id);
-                  } catch (err) {
-                      console.error(err);
-                      return msg.channel.send('🆘 I could not obtain any search results.');
-                  }
-              }
-              return handleVideo(video, msg, voiceChannel);
-          }
-      }
+                var response = await message.channel.awaitMessages(message2 => message2.content > 0 && message2.content < 11, {
+                  maxMatches: 1,
+                  time: 10000,
+                  errors: ['time']
+                });
+              } catch (err) {
+                console.error(err);
+                return message.channel.send('No or invalid value entered, cancelling video selection.');
+              }*/
+                    const videoIndex = 1 /*parseInt(response.first().content);*/
+                    var video = await youtube.getVideoByID(videos[videoIndex - 1].id);
+                } catch (err) {
+                    client.channels.get(error).send(`${message.author.tag} from ${message.guild.name} trying to use play command but i got a error ${err}`)
+                    return message.channel.send('🆘 I could not obtain any search results.');
+                }
+            }
+            return addSong(message, video, voiceChannel);
+        }
+    }
+
       if (command === 'fav') {
           var url = favsong[args[1]] ? favsong[args[1]].replace(/<(.+)>/g, '$1') : '';
           console.log(favsong[args[1]]);
@@ -104,12 +117,47 @@ Please provide a value to select one of the 🔎 results ranging from 1-10.
               return handleVideo(video, msg, voiceChannel);
           }
       } 
-        if (command === 'skip') {
+        /*if (command === 'skip') {
           if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel!');
           if (!serverQueue) return msg.channel.send('There is nothing playing that I could skip for you.');
           serverQueue.connection.dispatcher.end('Skip command has been used!');
           return undefined;
-      }
+      }*/
+       if (command === "skip" || command === "next" || command === "s") {
+        if (message.member.voiceChannel !== undefined) {
+            if (!message.guild.me.voiceChannel) {
+                message.channel.send("bot is not in voice channel and nothing to play", { reply: message });
+                return;
+            }
+            if (serverQueue.songs.length > 0) {
+                previousSongIndex = currentSongIndex;
+                var amount = Number.parseInt(args[0]);
+                if (Number.isInteger(amount)) {
+                    currentSongIndex += amount;
+                } else {
+                    currentSongIndex++;
+                }
+                if (currentSongIndex > serverQueue.songs.length - 1) {
+                    currentSongIndex = serverQueue.songs.length - 1;
+                    serverQueue.songs = [];
+                    currentSongIndex = 0;
+                    message.member.voiceChannel.leave();
+                    var finishembed = new Discord.RichEmbed()
+                        .setColor(randomcolor)
+                        .setAuthor("Finished playing because no more song in the queue", "https://cdn.discordapp.com/attachments/398789265900830760/405592021579989003/videotogif_2018.01.24_10.46.57.gif")
+                        .setDescription("please add more song if you like 🎧")
+                        .setFooter("Developed by: PK#1650 ", "https://cdn.discordapp.com/attachments/399064303170224131/405585474988802058/videotogif_2018.01.24_10.14.40.gif")
+                        .setTimestamp();
+                    message.channel.send({ embed: finishembed });
+                }
+                dispatcher.end("next");
+            } else {
+                message.channel.send("There are no more songs :sob:", { reply: message });
+            }
+        } else {
+            message.channel.send("You can't hear my music if you're not in a voice channel :cry:", { reply: message });
+        }
+    }
       if (command === 'stop') {
           if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel!');
           if (!serverQueue) return msg.channel.send('There is nothing playing that I could stop for you.');
