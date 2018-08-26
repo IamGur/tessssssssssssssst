@@ -142,17 +142,24 @@ Please provide a value to select one of the 🔎 results ranging from 1-10.
           msg.channel.send(volval)
 
       }
-      if (command === 'np') {
-          if (!serverQueue) return msg.channel.send('There is nothing playing.');
-          return msg.channel.send(`🎶 Now playing: **${serverQueue.songs[0].title}**`);
-      } else if (command === 'queue') {
-          if (!serverQueue) return msg.channel.send('There is nothing playing.');
-          return msg.channel.send(`
-__**Song queue:**__
-${serverQueue.songs.map(song => `**-** ${song.title}`).join('\n')}
-**Now playing:** ${serverQueue.songs[0].title}
-  `);
-      }
+if (command === "np") {
+        if (!message.guild.me.voiceChannel) {
+            message.channel.send("bot is not in voice channel and nothing to play", { reply: message });
+            return;
+        }
+        if (serverQueue.songs.length > 0) {
+            var songembed = new Discord.RichEmbed()
+                .setColor(randomcolor)
+                .setAuthor(`The current song is \`${serverQueue.songs[currentSongIndex].title}\` 🎧`)
+                .setDescription("link here: " + `[click](${serverQueue.songs[currentSongIndex].url})`)
+                .setThumbnail(`${serverQueue.songs[currentSongIndex].thumbnail}`)
+                .setFooter(`Added by ${serverQueue.songs[currentSongIndex].user}`, serverQueue.songs[currentSongIndex].usravatar)
+                .setTimestamp();
+            message.channel.send({ embed: songembed });
+        } else {
+            message.channel.send("No song is in the queue", { reply: message });
+        }
+    }
       if (command === 'pause') {
           if (serverQueue && serverQueue.playing) {
               serverQueue.playing = false;
