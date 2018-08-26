@@ -72,6 +72,41 @@ Please provide a value to select one of the 🔎 results ranging from 1-10.
               return handleVideo(video, msg, voiceChannel);
           }
       }
+          if (command === "skip" || command === "next" || command === "s") {
+        if (message.member.voiceChannel !== undefined) {
+            if (!message.guild.me.voiceChannel) {
+                message.channel.send("bot is not in voice channel and nothing to play", { reply: message });
+                return;
+            }
+            if (serverQueue.songs.length > 0) {
+                previousSongIndex = currentSongIndex;
+                var amount = Number.parseInt(args[0]);
+                if (Number.isInteger(amount)) {
+                    currentSongIndex += amount;
+                } else {
+                    currentSongIndex++;
+                }
+                if (currentSongIndex > serverQueue.songs.length - 1) {
+                    currentSongIndex = serverQueue.songs.length - 1;
+                    serverQueue.songs = [];
+                    currentSongIndex = 0;
+                    message.member.voiceChannel.leave();
+                    var finishembed = new Discord.RichEmbed()
+                        .setColor(randomcolor)
+                        .setAuthor("Finished playing because no more song in the queue", `${message.author.displayAvatarURL}`)
+                        .setDescription("please add more song if you like 🎧")
+                        .setTimestamp();
+                    message.channel.send({ embed: finishembed });
+                }
+                dispatcher.end("next");
+            } else {
+                message.channel.send("There are no more songs :sob:", { reply: message });
+            }
+        } else {
+            message.channel.send("You can't hear my music if you're not in a voice channel :cry:", { reply: message });
+        }
+    }
+
       if (command === 'fav') {
           var url = favsong[args[1]] ? favsong[args[1]].replace(/<(.+)>/g, '$1') : '';
           console.log(favsong[args[1]]);
@@ -104,12 +139,14 @@ Please provide a value to select one of the 🔎 results ranging from 1-10.
               }
               return handleVideo(video, msg, voiceChannel);
           }
-      } else if (command === 'skip') {
+      }
+      /*if (command === 'skip') {
           if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel!');
           if (!serverQueue) return msg.channel.send('There is nothing playing that I could skip for you.');
           serverQueue.connection.dispatcher.end('Skip command has been used!');
           return undefined;
-      } else if (command === 'stop') {
+      }*/ 
+      if (command === 'stop') {
           if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel!');
           if (!serverQueue) return msg.channel.send('There is nothing playing that I could stop for you.');
           serverQueue.songs = [];
