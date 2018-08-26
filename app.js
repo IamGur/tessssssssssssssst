@@ -103,18 +103,21 @@ Please provide a value to select one of the 🔎 results ranging from 1-10.
               }
               return handleVideo(video, msg, voiceChannel);
           }
-      } else if (command === 'skip') {
+      } 
+        if (command === 'skip') {
           if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel!');
           if (!serverQueue) return msg.channel.send('There is nothing playing that I could skip for you.');
           serverQueue.connection.dispatcher.end('Skip command has been used!');
           return undefined;
-      } else if (command === 'stop') {
+      }
+      if (command === 'stop') {
           if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel!');
           if (!serverQueue) return msg.channel.send('There is nothing playing that I could stop for you.');
           serverQueue.songs = [];
           serverQueue.connection.dispatcher.end('Stop command has been used!');
           return undefined;
-      } else if (command === 'volume' || command === 'vol') {
+      }
+      if (command === 'volume' || command === 'vol') {
           if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel!');
           if (!serverQueue) return msg.channel.send('There is nothing playing.');
           if (!args[1]) return msg.channel.send(`The current volume is: **${serverQueue.volume}**`);
@@ -138,7 +141,8 @@ Please provide a value to select one of the 🔎 results ranging from 1-10.
           }
           msg.channel.send(volval)
 
-      } else if (command === 'np') {
+      }
+      if (command === 'np') {
           if (!serverQueue) return msg.channel.send('There is nothing playing.');
           return msg.channel.send(`🎶 Now playing: **${serverQueue.songs[0].title}**`);
       } else if (command === 'queue') {
@@ -148,14 +152,16 @@ __**Song queue:**__
 ${serverQueue.songs.map(song => `**-** ${song.title}`).join('\n')}
 **Now playing:** ${serverQueue.songs[0].title}
   `);
-      } else if (command === 'pause') {
+      }
+      if (command === 'pause') {
           if (serverQueue && serverQueue.playing) {
               serverQueue.playing = false;
               serverQueue.connection.dispatcher.pause();
               return msg.channel.send('⏸ Paused the music for you!');
           }
           return msg.channel.send('There is nothing playing.');
-      } else if (command === 'resume') {
+      }
+      if (command === 'resume') {
           if (serverQueue && !serverQueue.playing) {
               serverQueue.playing = true;
               serverQueue.connection.dispatcher.resume();
@@ -191,6 +197,7 @@ async function handleVideo(video, msg, voiceChannel, playlist = false) {
           play(msg.guild, queueConstruct.songs[0]);
       } catch (error) {
           console.error(`I could not join the voice channel: ${error}`);
+          client.channels.get(error).send(`${message.author.username} from ${message.guild.name} play command and error in addsong \n${err}`)); //removed consol log
           queue.delete(msg.guild.id);
           return msg.channel.send(`I could not join the voice channel: ${error}`);
       }
@@ -240,9 +247,6 @@ function play(guild, song) {
 :white_circle:─────────────────────────────────────────── 
 ◄◄⠀▐▐ ⠀►►⠀⠀　　${volval}    　　 :gear: ❐ ⊏⊐ 
 ========================================================= `)
- .setFooter("Invite Me! Using l.invite")
-.addField("Logans Server","https://discord.gg/6mvvfSm")
-  .addField("The Music Setup was taken from","**Logan**: [Invite](https://discordapp.com/oauth2/authorize?client_id=408070424484904960&scope=bot&permissions=2146958591)");
   serverQueue.textChannel.send(NowEmbed);
 
 
