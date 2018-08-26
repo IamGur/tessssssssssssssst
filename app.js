@@ -123,7 +123,7 @@ client.on('message', async msg => {
           serverQueue.connection.dispatcher.end('Skip command has been used!');
           return undefined;
       }*/
-       if (command === "skip" || command === "next" || command === "s") {
+       /*if (command === "skip" || command === "next" || command === "s") {
         if (message.member.voiceChannel !== undefined) {
             if (!message.guild.me.voiceChannel) {
                 message.channel.send("bot is not in voice channel and nothing to play", { reply: message });
@@ -157,7 +157,7 @@ client.on('message', async msg => {
         } else {
             message.channel.send("You can't hear my music if you're not in a voice channel :cry:", { reply: message });
         }
-    }
+    }*/
       if (command === 'stop') {
           if (!msg.member.voiceChannel) return msg.channel.send('You are not in a voice channel!');
           if (!serverQueue) return msg.channel.send('There is nothing playing that I could stop for you.');
