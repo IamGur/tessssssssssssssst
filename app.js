@@ -34,7 +34,7 @@ client.on('message', async msg => {
       let command = msg.content.toLowerCase().split(' ')[0];
       command = command.slice(prefix.length)
         if (command === "play" || command === "p" || command === "yt") {
-        const youtube = new YouTube(process.env.GOOGLEAPIKEY);
+        const youtube = new YouTube(process.env.APIKEY);
         const voiceChannel = message.member.voiceChannel;
         let args0 = args.join("").substring(command.length);
         let searchString = args0.slice();
