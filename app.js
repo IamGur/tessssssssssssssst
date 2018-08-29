@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const logchannel = '475564126140104704';
+const Dav =  "324432889561219072";
 const YouTube = require('simple-youtube-api');
 const ytdl = require('ytdl-core');
 const youtube = new YouTube(process.env.APIKEY);
