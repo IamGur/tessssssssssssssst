@@ -6,7 +6,7 @@
   "dependencies": {
     "discord.js": "^11.1.0",
     "dotenv": "^4.0.0",
-    "googleapis": "^20.1.0",
+    "googleapis": "^59.0.0",
     "node-opus": "^0.2.6",
     "heroku.node": "^0.2.1",
     "pm2": "2.10.1",
